@@ -33,7 +33,7 @@
 				<c:forEach items="${nList }" var="notice">
 				<tr>
 					<td style="text-align:center;">${notice.noticeNo }</td>	<!-- 여기서 가져오는 변수는 Notice.java 와 통일해야해 -->
-					<td>${notice.noticeSubject }</td>
+					<td><a href="/notice/detail?notice-no=${notice.noticeNo }">${notice.noticeSubject }</a></td>
 					<td>${notice.noticeWriter }</td>
 					<td>${notice.noticeDate }</td>
 					<td style="text-align:center;">${notice.viewCount }</td>
