@@ -33,7 +33,8 @@
 			</li>
 		</ul>
 		<a href = "/notice/list">목록으로 이동</a>
-		<a href = "#">수정하기</a>
+		<!-- 보고있는 공지사항을 수정해야 하기 때문에 쿼리스트링 필요 -->
+		<a href = "/notice/modify?notice-no=${notice.noticeNo }">수정하기</a>
 		<a href = "javascript:void(0);" onclick="deleteCheck();">삭제하기</a>
 		<!-- javascript:void(0); 하이퍼링크를 동작하지 않게 만들어줌 -->
 		<script>

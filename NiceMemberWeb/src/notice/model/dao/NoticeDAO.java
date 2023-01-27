@@ -39,12 +39,26 @@ public class NoticeDAO {
 	 * @param conn
 	 * @return nList
 	 */
-	public List<Notice> selectAllNotice(Connection conn) {
-		String query = "SELECT * FROM NOTICE_TBL";
+	public List<Notice> selectAllNotice(Connection conn, int currentPage) {
+		String query = "SELECT * FROM(SELECT ROW_NUMBER() OVER(ORDER BY NOTICE_NO DESC) AS NUM, NOTICE_TBL.* FROM NOTICE_TBL) WHERE NUM BETWEEN ? AND ?";
 		List<Notice> nList = null;
+		//한번에 보여줄 페이지 수를 10으로 고정(이걸 동적으로 바뀌게 하려면 Connection conn이 있는곳에 같이 적어줘야해)
+		int recordCountPerPage = 10;
+		// currentPage=1, recordCountPerPage=10
+		// start=1
+		// currentPage=2, recordCountPerPage=10
+		// start=11
+		// currentPage=3, recordCountPerPage=10
+		// start=21 를 바탕으로 수식을 만들어줌
+		int start = (currentPage*recordCountPerPage)-(recordCountPerPage-1);
+		int end = (currentPage*recordCountPerPage);
 		try {
-			Statement stmt = conn.createStatement();
-			ResultSet rset = stmt.executeQuery(query);
+			//Statement stmt = conn.createStatement();
+			//ResultSet rset = stmt.executeQuery(query);
+			PreparedStatement pstmt = conn.prepareStatement(query);
+			pstmt.setInt(1, start);
+			pstmt.setInt(2, end);
+			ResultSet rset = pstmt.executeQuery();
 			nList = new ArrayList<Notice>();
 			while(rset.next()) {
 				Notice notice = new Notice();
@@ -58,11 +72,37 @@ public class NoticeDAO {
 				nList.add(notice);
 			}
 			rset.close();
-			stmt.close();
+			pstmt.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 		return nList;
+	}
+	
+	// 페이지 네비게이터를 만들어주는 메소드
+	public String generatePageNavi(int currentPage) {
+		// 전체 게시물 수 : 37 -> 네비게이터 수 : 4개
+		int totalCount = 27;
+		int recordCountPerPage = 10;
+		int naviTotalCount = 0;
+		if(totalCount % recordCountPerPage > 0) {
+			naviTotalCount = totalCount / recordCountPerPage + 1;
+		}else {
+			naviTotalCount = totalCount / recordCountPerPage;
+		}
+		// 한 페이지당 몇개씩 보여주는지(맨 밑에 나오는애가)
+		int naviCountPerPage = 5;
+		int startNavi = ((currentPage-1) / naviCountPerPage) * naviCountPerPage + 1;
+		int endNavi = startNavi + naviCountPerPage - 1;
+		if(endNavi > naviTotalCount) {
+			endNavi = naviTotalCount;
+		}
+		// 유동적으로 바뀌는 페이지네비게이터를 만들기 위함
+		StringBuilder sb = new StringBuilder();
+		for(int i = startNavi; i <= endNavi; i++) {
+			sb.append("<a href='/notice/list?page="+i+"'>"+i+"</a>");			
+		}
+		return sb.toString();
 	}
 
 	/**
@@ -108,6 +148,23 @@ public class NoticeDAO {
 			PreparedStatement pstmt = conn.prepareStatement(query);
 			pstmt.setInt(1, noticeNo);
 			result = pstmt.executeUpdate();
+			pstmt.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return result;
+	}
+
+	public int updateNotice(Connection conn, Notice notice) {
+		String query = "UPDATE NOTICE_TBL SET NOTICE_SUBJECT = ?, NOTICE_CONTENT = ? WHERE NOTICE_NO = ?";
+		int result = 0;
+		try {
+			PreparedStatement pstmt = conn.prepareStatement(query);
+			pstmt.setString(1, notice.getNoticeSubject());
+			pstmt.setString(2, notice.getNoticeContent());
+			pstmt.setInt(3, notice.getNoticeNo());
+			result = pstmt.executeUpdate();
+			
 			pstmt.close();
 		} catch (SQLException e) {
 			e.printStackTrace();

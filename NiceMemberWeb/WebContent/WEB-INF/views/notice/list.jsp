@@ -39,6 +39,14 @@
 					<td style="text-align:center;">${notice.viewCount }</td>
 				</tr>				
 				</c:forEach>
+				<tr>
+					<td colspan = "5" align="center">
+						${pageNavi }
+						<!-- 이렇게 고정으로 만들지 않고 동적으로 만들어줘야해(DAO에서 만들어준다 generatePageNavi) -->
+						<!-- <a href="/notice/list?page=1">1</a> <a href="/notice/list?page=2">2</a> <a href="/notice/list?page=3">3</a>
+						<a href="/notice/list?page=4">4</a> <a href="/notice/list?page=5">5</a> -->
+					</td>
+				</tr>
 			</tbody>
 		</table>
 	</body>
