@@ -36,7 +36,7 @@ public class NoticeService {
 	public PageData selectAllNotice(int currentPage) {
 		Connection conn = JDBCTemplate.getConnection();
 		List<Notice> nList = nDao.selectAllNotice(conn,currentPage);
-		String pageNavigator = nDao.generatePageNavi(currentPage);	// 페이지 네비게이터
+		String pageNavigator = nDao.generatePageNavi(conn, currentPage);	// 페이지 네비게이터
 		// nList와 pageNavigator를 한번에 담아서 보내기 위해
 		// 1. 새로운 VO생성(이 방법을 사용)
 		// 2. 해쉬맵 사용

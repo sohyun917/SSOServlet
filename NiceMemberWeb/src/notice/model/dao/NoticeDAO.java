@@ -80,9 +80,9 @@ public class NoticeDAO {
 	}
 	
 	// 페이지 네비게이터를 만들어주는 메소드
-	public String generatePageNavi(int currentPage) {
+	public String generatePageNavi(Connection conn, int currentPage) {
 		// 전체 게시물 수 : 37 -> 네비게이터 수 : 4개
-		int totalCount = 27;
+		int totalCount = getRecordTotalCount(conn);
 		int recordCountPerPage = 10;
 		int naviTotalCount = 0;
 		if(totalCount % recordCountPerPage > 0) {
@@ -105,6 +105,21 @@ public class NoticeDAO {
 		return sb.toString();
 	}
 
+	// 페이지 전체 게시물 가져오는 메소드
+	public int getRecordTotalCount(Connection conn) {
+		String query = "SELECT COUNT(*) AS TOTALCOUNT FROM NOTICE_TBL";
+		int recordTotalCount = 0;
+		try {
+			Statement stmt = conn.createStatement();
+			ResultSet rset = stmt.executeQuery(query);
+			if(rset.next()) {
+				recordTotalCount = rset.getInt("TOTALCOUNT");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return recordTotalCount;
+	}
 	/**
 	 * 공지사항 상세조회 dao
 	 * @param conn
